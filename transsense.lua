@@ -539,6 +539,7 @@ enemys:AddLabel("Gradient color"):AddColorPicker("ColorPicker1", {
   Title = "Gradient color",
   Transparency = 0,
   Callback = function(Value)
+    esp.BoxFill.Gradient.From = Value
     esp.BoxFill.Gradient.To = Value
   end,
 })
@@ -572,7 +573,7 @@ enemys:AddLabel("Solid color"):AddColorPicker("ColorPicker1", {
   Title = "Solid color",
   Transparency = 0,
   Callback = function(Value)
-    esp.BoxFill.Color = Value
+    esp.HealthBar.Color = Value
   end,
 })
 

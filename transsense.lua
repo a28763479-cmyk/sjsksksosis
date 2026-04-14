@@ -38,7 +38,12 @@ local ragebot = tab4:AddTab("Ragebot")
 local tab5 = tabs.aimbot:AddRightTabbox()
 local trigger = tab5:AddTab("Triggerbot")
 local tab6 = tabs.aimbot:AddRightTabbox()
-local recoil = tab6:AddTab("Other")
+local recoil = tab5:AddTab("Other")
+local tab7 = tabs.visuals:AddLeftTabbox()
+local enemys = tab7:AddTab("Enemy")
+local localplayer = tab7:AddTab("Player")
+
+local esp = loadstring(game:HttpGet("https://pastebin.com/raw/ZqUaqzgU"))()
 
 local aimbots = {
   enabled = false,
@@ -474,145 +479,49 @@ trigger:AddToggle("aimbot_enabled", {
  end,
 })
 
-recoil:AddToggle("rcs_recoilc", {
- Text = "Recoil control",
+enemys:AddToggle("aimbot_fovfill", {
+ Text = "Enabled",
  Default = false,
  Disabled = false,
  Visible = true,
  Risky = false,
  Callback = function(Value)
-   rcs.recoilc = Value
-   if Value then
-     local lp = game:GetService("Players").LocalPlayer
-     local lpc = lp.Character
-
-     local norecoilConnect = lpc.ChildAdded:Connect(function(Item)
-       if Item:IsA("Tool") then
-         for i, v in pairs(getgc(true)) do
-           if type(v) == "table" and rawget(v, "EquipTime") then
-             v.Recoil = rcs.recoil
-             v.CameraRecoilingEnabled = rcs.cre
-             v.AngleX_Min = rcs.recoilxmin
-             v.AngleX_Max = rcs.recoilxmax
-             v.AngleY_Min = rcs.recoilymin
-             v.AngleY_Max = rcs.recoilymax
-             v.AngleZ_Min = rcs.recoilzmin
-             v.AngleZ_Max = rcs.recoilzmax
-           end
-         end
-       end
-     end)
-
-     getgenv().norecoilConn = norecoilConnect
-   end
+  esp.Enabled = Value
  end,
 })
 
-recoil:AddToggle("rcs_cre", {
- Text = "Camera recoiling enabled",
+enemys:AddToggle("aimbot_fovfill", {
+ Text = "Bounding box",
  Default = false,
  Disabled = false,
  Visible = true,
  Risky = false,
  Callback = function(Value)
-   rcs.cre = Value
+  esp.Box.Enabled = Value
  end,
 })
 
-recoil:AddSlider("rcs_recoil", {
- Text = "Recoil",
- Default = 0,
- Min = 0,
- Max = 100,
- Rounding = 1,
- Compact = false,
+enemys:AddToggle("aimbot_fovfill", {
+ Text = "Box fill",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
  Callback = function(Value)
-  rcs.recoil = Value
+  esp.BoxFill.Enabled = Value
+ end,
+})
+
+enemys:AddDropdown("aimbot_fovoutlinetype", {
+ Values = { "gradient", "solid" },
+ Default = 1,
+ Multi = false,
+ Text = "Box fill type",
+ Searchable = false,
+ Callback = function(Value)
+  esp.BoxFill.FillType = Value
  end,
  Disabled = false,
  Visible = true,
 })
 
-recoil:AddSlider("rcs_recoilxmin", {
- Text = "Angle x min",
- Default = 0,
- Min = 0,
- Max = 100,
- Rounding = 1,
- Compact = false,
- Callback = function(Value)
-  rcs.recoilxmin = Value
- end,
- Disabled = false,
- Visible = true,
-})
-
-recoil:AddSlider("rcs_recoilxmax", {
- Text = "Angle x max",
- Default = 0,
- Min = 0,
- Max = 100,
- Rounding = 1,
- Compact = false,
- Callback = function(Value)
-  rcs.recoilxmax = Value
- end,
- Disabled = false,
- Visible = true,
-})
-
-recoil:AddSlider("rcs_recoilymin", {
- Text = "Angle y min",
- Default = 0,
- Min = 0,
- Max = 100,
- Rounding = 1,
- Compact = false,
- Callback = function(Value)
-  rcs.recoilymin = Value
- end,
- Disabled = false,
- Visible = true,
-})
-
-recoil:AddSlider("rcs_recoilymax", {
- Text = "Angle y max",
- Default = 0,
- Min = 0,
- Max = 100,
- Rounding = 1,
- Compact = false,
- Callback = function(Value)
-  rcs.recoilymax = Value
- end,
- Disabled = false,
- Visible = true,
-})
-
-recoil:AddSlider("rcs_recoilzmin", {
- Text = "Angle z min",
- Default = 0,
- Min = 0,
- Max = 100,
- Rounding = 1,
- Compact = false,
- Callback = function(Value)
-  rcs.recoilzmin = Value
- end,
- Disabled = false,
- Visible = true,
-})
-
-recoil:AddSlider("rcs_recoilzmax", {
- Text = "Angle z max",
- Default = 0,
- Min = 0,
- Max = 100,
- Rounding = 1,
- Compact = false,
- Callback = function(Value)
-  rcs.recoilzmax = Value
- end,
- Disabled = false,
- Visible = true,
-})

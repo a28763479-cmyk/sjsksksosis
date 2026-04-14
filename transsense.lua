@@ -626,13 +626,6 @@ enemys:AddToggle("aimbot_fovfill", {
  Callback = function(Value)
   esp.Name.Enabled = Value
  end,
-}):AddColorPicker("colorpicker3", {
-  Default = Color3.fromRGB(255, 255, 255),
-  Title = "Name color",
-  Transparency = 0,
-  Callback = function(value)
-    esp.Name.Color = Value
-  end,
 })
 
 enemys:AddToggle("aimbot_fovfill", {
@@ -644,11 +637,15 @@ enemys:AddToggle("aimbot_fovfill", {
  Callback = function(Value)
   esp.ToolESP.Enabled = Value
  end,
-}):AddColorPicker("colorpicker3", {
-  Default = Color3.fromRGB(255, 255, 255),
-  Title = "Weapon color",
-  Transparency = 0,
-  Callback = function(value)
-    esp.ToolESP.Color = Value
-  end,
+})
+
+enemys:AddToggle("aimbot_fovfill", {
+ Text = "Health text",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  esp.HealthText.Enabled = Value
+ end,
 })

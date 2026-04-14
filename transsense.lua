@@ -38,7 +38,7 @@ local ragebot = tab4:AddTab("Ragebot")
 local tab5 = tabs.aimbot:AddRightTabbox()
 local trigger = tab5:AddTab("Triggerbot")
 local tab6 = tabs.aimbot:AddRightTabbox()
-local recoil = tab5:AddTab("Other")
+local recoil = tab6:AddTab("Other")
 
 local aimbots = {
   enabled = false,
@@ -474,7 +474,7 @@ trigger:AddToggle("aimbot_enabled", {
  end,
 })
 
-other:AddToggle("aimbot_enabled", {
+recoil:AddToggle("aimbot_enabled", {
  Text = "Recoil control",
  Default = false,
  Disabled = false,
@@ -508,7 +508,7 @@ other:AddToggle("aimbot_enabled", {
  end,
 })
 
-other:AddToggle("aimbot_enabled", {
+recoil:AddToggle("aimbot_enabled", {
  Text = "Camera recoiling enabled",
  Default = false,
  Disabled = false,
@@ -519,7 +519,7 @@ other:AddToggle("aimbot_enabled", {
  end,
 })
 
-other:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("aimbot_fovsize", {
  Text = "Recoil",
  Default = 0,
  Min = 0,
@@ -533,7 +533,7 @@ other:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-other:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("aimbot_fovsize", {
  Text = "Angle x min",
  Default = 0,
  Min = 0,
@@ -547,7 +547,7 @@ other:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-other:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("aimbot_fovsize", {
  Text = "Angle x max",
  Default = 0,
  Min = 0,
@@ -561,7 +561,7 @@ other:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-other:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("aimbot_fovsize", {
  Text = "Angle y min",
  Default = 0,
  Min = 0,
@@ -575,7 +575,7 @@ other:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-other:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("aimbot_fovsize", {
  Text = "Angle y max",
  Default = 0,
  Min = 0,
@@ -589,7 +589,7 @@ other:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-other:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("aimbot_fovsize", {
  Text = "Angle z min",
  Default = 0,
  Min = 0,
@@ -603,7 +603,7 @@ other:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-other:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("aimbot_fovsize", {
  Text = "Angle z max",
  Default = 0,
  Min = 0,

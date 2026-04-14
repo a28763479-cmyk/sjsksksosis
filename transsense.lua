@@ -513,7 +513,7 @@ enemys:AddToggle("aimbot_fovfill", {
 })
 
 enemys:AddDropdown("aimbot_fovoutlinetype", {
- Values = { "gradient", "solid" },
+ Values = { "Gradient", "Solid" },
  Default = 1,
  Multi = false,
  Text = "Box fill type",
@@ -525,3 +525,129 @@ enemys:AddDropdown("aimbot_fovoutlinetype", {
  Visible = true,
 })
 
+enemys:AddLabel("Solid color"):AddColorPicker("ColorPicker1", {
+  Default = Color3.fromRGB(0, 255, 80),
+  Title = "Solid color",
+  Transparency = 0,
+  Callback = function(Value)
+    esp.BoxFill.Color = Value
+  end,
+})
+
+enemys:AddLabel("Gradient color"):AddColorPicker("ColorPicker1", {
+  Default = Color3.fromRGB(0, 255, 80),
+  Title = "Gradient color",
+  Transparency = 0,
+  Callback = function(Value)
+    esp.BoxFill.Gradient.To = Value
+  end,
+})
+
+enemys:AddToggle("aimbot_fovfill", {
+ Text = "Health bar",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  esp.HealthBar.Enabled = Value
+ end,
+})
+
+enemys:AddDropdown("aimbot_fovoutlinetype", {
+ Values = { "Gradient", "Solid" },
+ Default = 1,
+ Multi = false,
+ Text = "Health bar fill type",
+ Searchable = false,
+ Callback = function(Value)
+  esp.HealthBar.FillType = Value
+ end,
+ Disabled = false,
+ Visible = true,
+})
+
+enemys:AddLabel("Solid color"):AddColorPicker("ColorPicker1", {
+  Default = Color3.fromRGB(0, 255, 80),
+  Title = "Solid color",
+  Transparency = 0,
+  Callback = function(Value)
+    esp.BoxFill.Color = Value
+  end,
+})
+
+local top_color = Color3.fromRGB(0, 255, 80)
+local mid_color = Color3.fromRGB(255, 200, 0)
+local bottom_color = Color3.fromRGB(255, 30, 30)
+
+local function update_health_gradient()
+    if esp and esp.HealthBar and esp.HealthBar.Gradient then
+        esp.HealthBar.Gradient.Keys = {
+            ColorSequenceKeypoint.new(0, top_color),
+            ColorSequenceKeypoint.new(0.5, mid_color),
+            ColorSequenceKeypoint.new(1, bottom_color)
+        }
+    end
+end
+
+enemys:AddLabel("Gradient color"):AddColorPicker("colorpicker1", {
+  Default = top_color,
+  Title = "Top color",
+  Transparency = 0,
+  Callback = function(value)
+    top_color = value
+    update_health_gradient()
+  end,
+}):AddColorPicker("colorpicker2", {
+  Default = mid_color,
+  Title = "Middle color",
+  Transparency = 0,
+  Callback = function(value)
+    mid_color = value
+    update_health_gradient()
+  end,
+}):AddColorPicker("colorpicker3", {
+  Default = bottom_color,
+  Title = "Bottom color",
+  Transparency = 0,
+  Callback = function(value)
+    bottom_color = value
+    update_health_gradient()
+  end,
+})
+
+enemys:AddToggle("aimbot_fovfill", {
+ Text = "Name",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  esp.Name.Enabled = Value
+ end,
+}):AddColorPicker("colorpicker3", {
+  Default = Color3.fromRGB(255, 255, 255),
+  Title = "Name color",
+  Transparency = 0,
+  Callback = function(value)
+    esp.Name.Color = Value
+  end,
+})
+
+enemys:AddToggle("aimbot_fovfill", {
+ Text = "Weapon",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  esp.ToolESP.Enabled = Value
+ end,
+}):AddColorPicker("colorpicker3", {
+  Default = Color3.fromRGB(255, 255, 255),
+  Title = "Weapon color",
+  Transparency = 0,
+  Callback = function(value)
+    esp.ToolESP.Color = Value
+  end,
+})

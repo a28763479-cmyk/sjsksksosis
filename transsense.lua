@@ -474,7 +474,7 @@ trigger:AddToggle("aimbot_enabled", {
  end,
 })
 
-recoil:AddToggle("aimbot_enabled", {
+recoil:AddToggle("rcs_recoilc", {
  Text = "Recoil control",
  Default = false,
  Disabled = false,
@@ -508,7 +508,7 @@ recoil:AddToggle("aimbot_enabled", {
  end,
 })
 
-recoil:AddToggle("aimbot_enabled", {
+recoil:AddToggle("rcs_cre", {
  Text = "Camera recoiling enabled",
  Default = false,
  Disabled = false,
@@ -519,7 +519,7 @@ recoil:AddToggle("aimbot_enabled", {
  end,
 })
 
-recoil:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("rcs_recoil", {
  Text = "Recoil",
  Default = 0,
  Min = 0,
@@ -533,7 +533,7 @@ recoil:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-recoil:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("rcs_recoilxmin", {
  Text = "Angle x min",
  Default = 0,
  Min = 0,
@@ -547,7 +547,7 @@ recoil:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-recoil:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("rcs_recoilxmax", {
  Text = "Angle x max",
  Default = 0,
  Min = 0,
@@ -561,7 +561,7 @@ recoil:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-recoil:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("rcs_recoilymin", {
  Text = "Angle y min",
  Default = 0,
  Min = 0,
@@ -575,7 +575,7 @@ recoil:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-recoil:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("rcs_recoilymax", {
  Text = "Angle y max",
  Default = 0,
  Min = 0,
@@ -589,7 +589,7 @@ recoil:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-recoil:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("rcs_recoilzmin", {
  Text = "Angle z min",
  Default = 0,
  Min = 0,
@@ -603,7 +603,7 @@ recoil:AddSlider("aimbot_fovsize", {
  Visible = true,
 })
 
-recoil:AddSlider("aimbot_fovsize", {
+recoil:AddSlider("rcs_recoilzmax", {
  Text = "Angle z max",
  Default = 0,
  Min = 0,

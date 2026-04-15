@@ -44,6 +44,7 @@ local enemys = tab7:AddTab("Enemy")
 local localplayer = tab7:AddTab("Player")
 
 local esp = loadstring(game:HttpGet("https://pastebin.com/raw/ZqUaqzgU"))()
+local arrow = loadstring(game:HttpGet("https://pastebin.com/raw/kpejN66K"))()
 
 local aimbots = {
   enabled = false,
@@ -657,7 +658,7 @@ enemys:AddToggle("aimbot_fovfill", {
  Visible = true,
  Risky = false,
  Callback = function(Value)
-  esp.Arrow.Enabled = Value
+  arrow.Arrow.Enabled = Value
  end,
 })
 
@@ -669,7 +670,7 @@ enemys:AddSlider("aimbot_fovsize", {
  Rounding = 1,
  Compact = false,
  Callback = function(Value)
-  esp.Arrow.Radius = Value
+  arrow.Arrow.Radius = Value
  end,
  Disabled = false,
  Visible = true,

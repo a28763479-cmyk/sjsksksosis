@@ -649,3 +649,14 @@ enemys:AddToggle("aimbot_fovfill", {
   esp.HealthText.Enabled = Value
  end,
 })
+
+enemys:AddToggle("aimbot_fovfill", {
+ Text = "Distance",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  esp.Distance.Enabled = Value
+ end,
+})

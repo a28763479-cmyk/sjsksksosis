@@ -42,6 +42,9 @@ local recoil = tab5:AddTab("Other")
 local tab7 = tabs.visuals:AddLeftTabbox()
 local enemys = tab7:AddTab("Enemy")
 local localplayer = tab7:AddTab("Player")
+local tab8 = tabs.visuals:AddRightTabbox()
+local worlds = tab8:AddTab("World")
+local view = tab8:AddTab("View")
 
 local esp = loadstring(game:HttpGet("https://pastebin.com/raw/ZqUaqzgU"))()
 local arrow = loadstring(game:HttpGet("https://pastebin.com/raw/kpejN66K"))()
@@ -130,22 +133,22 @@ fovfill.ZIndex = 0
 run.RenderStepped:Connect(function()
   local pos = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
   fov.Position = pos
-  fov.Visible = aimbots.fovcircle
+  fov.Visible = aimbots.enabled and aimbots.fovcircle
   fov.Radius = aimbots.fovsize
   fov.Color = aimbots.fovcolor
   
   fovo1.Position = pos
-  fovo1.Visible = aimbots.fovcircle and aimbots.fovoutline and (aimbots.fovoutlinetype[1] == "Inline" or aimbots.fovoutlinetype[1] == "Outline and inline")
+  fovo1.Visible = aimbots.enabled and aimbots.fovcircle and aimbots.fovoutline and (aimbots.fovoutlinetype[1] == "Inline" or aimbots.fovoutlinetype[1] == "Outline and inline")
   fovo1.Radius = aimbots.fovsize
   fovo1.Color = Color3.new(0, 0, 0)
   
   fovo2.Position = pos
-  fovo2.Visible = aimbots.fovcircle and aimbots.fovoutline and (aimbots.fovoutlinetype[1] == "Outline" or aimbots.fovoutlinetype[1] == "Outline and inline")
+  fovo2.Visible = aimbots.enabled and aimbots.fovcircle and aimbots.fovoutline and (aimbots.fovoutlinetype[1] == "Outline" or aimbots.fovoutlinetype[1] == "Outline and inline")
   fovo2.Radius = aimbots.fovsize + 1
   fovo2.Color = Color3.new(0, 0, 0)
   
   fovfill.Position = pos
-  fovfill.Visible = aimbots.fovfill
+  fovfill.Visible = aimbots.enabled and aimbots.fovcircle and aimbots.fovfill
   fovfill.Radius = aimbots.fovsize
   fovfill.Transparency = aimbots.fovfilltrans
   fovfill.Color = aimbots.fovcolor
@@ -675,3 +678,47 @@ enemys:AddSlider("aimbot_fovsize", {
  Disabled = false,
  Visible = true,
 })
+
+local atmosc = Color3.fromRGB(255, 255, 255)
+local colorCorrection = nil
+
+worlds:AddToggle("atmosphere_color", {
+    Text = "Change atmosphere color",
+    Default = false,
+    Callback = function(Value)
+        local lighting = game:GetService("Lighting")
+        
+        if Value then
+            colorCorrection = lighting:FindFirstChild("ColorCorrection") or Instance.new("ColorCorrectionEffect")
+            colorCorrection.Name = "ColorCorrection"
+            colorCorrection.Parent = lighting
+            colorCorrection.TintColor = atmosc
+        else
+            if colorCorrection then
+                colorCorrection:Destroy()
+                colorCorrection = nil
+            end
+        end
+    end
+}):AddColorPicker("colorpicker3", {
+    Default = Color3.fromRGB(255, 255, 255),
+    Title = "Atmosphere color",
+    Transparency = 0,
+    Callback = function(value)
+        atmosc = value
+        if colorCorrection then
+            colorCorrection.TintColor = value
+        end
+    end
+})
+
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("MyScriptHub")
+SaveManager:SetFolder("MyScriptHub/specific-game")
+SaveManager:SetSubFolder("specific-place") 
+SaveManager:BuildConfigSection(tabs.settings)
+ThemeManager:ApplyToTab(tabs.settings)
+SaveManager:LoadAutoloadConfig()

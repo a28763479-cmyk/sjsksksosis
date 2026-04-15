@@ -651,12 +651,26 @@ enemys:AddToggle("aimbot_fovfill", {
 })
 
 enemys:AddToggle("aimbot_fovfill", {
- Text = "Distance",
+ Text = "Offscreen arrow",
  Default = false,
  Disabled = false,
  Visible = true,
  Risky = false,
  Callback = function(Value)
-  esp.Distance.Enabled = Value
+  esp.Arrow.Enabled = Value
  end,
+})
+
+enemys:AddSlider("aimbot_fovsize", {
+ Text = "Arrow Radius",
+ Default = 150,
+ Min = 1,
+ Max = 500,
+ Rounding = 1,
+ Compact = false,
+ Callback = function(Value)
+  esp.Arrow.Radius = Value
+ end,
+ Disabled = false,
+ Visible = true,
 })

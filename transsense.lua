@@ -666,7 +666,7 @@ enemys:AddToggle("aimbot_fovfill", {
 })
 
 enemys:AddSlider("aimbot_fovsize", {
- Text = "Arrow Radius",
+ Text = "Arrow radius",
  Default = 150,
  Min = 1,
  Max = 500,
@@ -674,6 +674,20 @@ enemys:AddSlider("aimbot_fovsize", {
  Compact = false,
  Callback = function(Value)
   arrow.Arrow.Radius = Value
+ end,
+ Disabled = false,
+ Visible = true,
+})
+
+enemys:AddSlider("aimbot_fovsize", {
+ Text = "Arrow size",
+ Default = 10,
+ Min = 1,
+ Max = 50,
+ Rounding = 2,
+ Compact = false,
+ Callback = function(Value)
+  arrow.Arrow.Size = Value
  end,
  Disabled = false,
  Visible = true,

@@ -712,6 +712,20 @@ worlds:AddToggle("atmosphere_color", {
     end
 })
 
+enemys:AddSlider("aimbot_fovsize", {
+ Text = "Max Distance",
+ Default = 100,
+ Min = 0,
+ Max = 1000,
+ Rounding = 1,
+ Compact = false,
+ Callback = function(Value)
+  esp.MaxDistance = Value
+ end,
+ Disabled = false,
+ Visible = true,
+})
+
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()

@@ -645,6 +645,17 @@ enemys:AddToggle("aimbot_fovfill", {
 })
 
 enemys:AddToggle("aimbot_fovfill", {
+ Text = "Health text",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  esp.HealthText.Enabled = Value
+ end,
+})
+
+enemys:AddToggle("aimbot_fovfill", {
  Text = "Chams",
  Default = false,
  Disabled = false,
@@ -695,7 +706,7 @@ enemys:AddSlider("aimbot_fovsize", {
 })
 
 enemys:AddToggle("aimbot_fovfill", {
- Text = "Offscreen arrow",
+ Text = "Off-screen arrow",
  Default = false,
  Disabled = false,
  Visible = true,
@@ -703,6 +714,13 @@ enemys:AddToggle("aimbot_fovfill", {
  Callback = function(Value)
   arrow.Arrow.Enabled = Value
  end,
+}):AddColorPicker("colorpicker3", {
+  Default = Color3.fromRGB(255, 255, 255),
+  Title = "Arrow color",
+  Transparency = 0,
+  Callback = function(value)
+    arrow.Arrow.Color = value
+  end,
 })
 
 enemys:AddSlider("aimbot_fovsize", {

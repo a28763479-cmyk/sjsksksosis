@@ -48,6 +48,7 @@ local view = tab8:AddTab("View")
 
 local esp = loadstring(game:HttpGet("https://pastebin.com/raw/ZqUaqzgU"))()
 local arrow = loadstring(game:HttpGet("https://pastebin.com/raw/kpejN66K"))()
+local chams = loadstring(game:HttpGet("https://pastebin.com/raw/wzQ5nPM8"))()
 
 local aimbots = {
   enabled = false,
@@ -644,14 +645,53 @@ enemys:AddToggle("aimbot_fovfill", {
 })
 
 enemys:AddToggle("aimbot_fovfill", {
- Text = "Health text",
+ Text = "Chams",
  Default = false,
  Disabled = false,
  Visible = true,
  Risky = false,
  Callback = function(Value)
-  esp.HealthText.Enabled = Value
+  chams.enabled = Value
  end,
+}):AddColorPicker("colorpicker3", {
+  Default = Color3.fromRGB(0, 0, 0),
+  Title = "Chams color",
+  Transparency = 0,
+  Callback = function(value)
+    chams.chamscolor = value
+  end,
+})
+
+enemys:AddToggle("aimbot_fovfill", {
+ Text = "Glow",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  chams.glow = Value
+ end,
+}):AddColorPicker("colorpicker3", {
+  Default = Color3.fromRGB(255, 255, 255),
+  Title = "Glow color",
+  Transparency = 0,
+  Callback = function(value)
+    chams.glowcolor = value
+  end,
+})
+
+enemys:AddSlider("aimbot_fovsize", {
+ Text = "Chams transparency",
+ Default = 0.5,
+ Min = 0,
+ Max = 1,
+ Rounding = 2,
+ Compact = false,
+ Callback = function(Value)
+  chams.transparency = Value
+ end,
+ Disabled = false,
+ Visible = true,
 })
 
 enemys:AddToggle("aimbot_fovfill", {

@@ -146,9 +146,9 @@ end)
 local function aimbotfunc()
   while true do
     if aimbots.enabled then
-      local hitboxpart = aimbots.hitbox or "Head"
+      local hitboxpart = aimbots.hitbox and aimbots.hitbox[1] or "Head"
       local character = lp.Character
-      if character and character:FindFirstChild(hitboxpart) then
+      if character and character:FindFirstChild("Head") then
         local targetpart = nil
         local shortest = aimbots.fovsize
         local center = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)

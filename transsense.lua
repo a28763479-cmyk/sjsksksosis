@@ -674,7 +674,7 @@ trigger:AddToggle("aimbot_enabled", {
  Visible = true,
  Risky = false,
  Callback = function(Value)
-   tswttings.wallcheck = Value
+   tsettings.wallcheck = Value
  end,
 })
 

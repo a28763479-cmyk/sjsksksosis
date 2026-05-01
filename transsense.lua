@@ -47,7 +47,7 @@ local worlds = tab8:AddTab("World")
 local view = tab8:AddTab("View")
 
 local esp = loadstring(game:HttpGet("https://pastebin.com/raw/ZqUaqzgU"))()
-local arrow = loadstring(game:HttpGet("https://pastebin.com/raw/kpejN66K"))()
+local arrow = loadstring(game:HttpGet("https://pastebin.com/raw/n1Pgmhjn"))()
 local chams = loadstring(game:HttpGet("https://pastebin.com/raw/wzQ5nPM8"))()
 
 local aimbots = {
@@ -702,14 +702,14 @@ enemys:AddToggle("aimbot_fovfill", {
  Visible = true,
  Risky = false,
  Callback = function(Value)
-  arrow.Arrow.Enabled = Value
+  arrow.Enabled = Value
  end,
 }):AddColorPicker("colorpicker3", {
   Default = Color3.fromRGB(255, 255, 255),
   Title = "Arrow color",
   Transparency = 0,
   Callback = function(value)
-    arrow.Arrow.Color = value
+    arrow.Color = value
   end,
 })
 
@@ -721,7 +721,7 @@ enemys:AddSlider("aimbot_fovsize", {
  Rounding = 1,
  Compact = false,
  Callback = function(Value)
-  arrow.Arrow.Radius = Value
+  arrow.Radius = Value
  end,
  Disabled = false,
  Visible = true,
@@ -729,13 +729,13 @@ enemys:AddSlider("aimbot_fovsize", {
 
 enemys:AddSlider("aimbot_fovsize", {
  Text = "Arrow size",
- Default = 10,
+ Default = 28,
  Min = 1,
  Max = 50,
  Rounding = 2,
  Compact = false,
  Callback = function(Value)
-  arrow.Arrow.Size = Value
+  arrow.Size = Value
  end,
  Disabled = false,
  Visible = true,

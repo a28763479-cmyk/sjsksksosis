@@ -657,7 +657,7 @@ trigger:AddToggle("aimbot_enabled", {
  Visible = true,
  Risky = false,
  Callback = function(Value)
-   settings.enabled = Value
+   tsettings.enabled = Value
  end,
 }):AddKeyPicker("silentkey", {
     Default = "None",
@@ -674,7 +674,7 @@ trigger:AddToggle("aimbot_enabled", {
  Visible = true,
  Risky = false,
  Callback = function(Value)
-   trigger.wallcheck = Value
+   tswttings.wallcheck = Value
  end,
 })
 
@@ -685,7 +685,7 @@ trigger:AddToggle("aimbot_enabled", {
  Visible = true,
  Risky = false,
  Callback = function(Value)
-   trigger.teamcheck = Value
+   tsettings.teamcheck = Value
  end,
 })
 
@@ -696,7 +696,7 @@ trigger:AddToggle("aimbot_enabled", {
  Visible = true,
  Risky = false,
  Callback = function(Value)
-   settings.downedcheck = Value
+   tsettings.downedcheck = Value
  end,
 })
 
@@ -707,7 +707,7 @@ trigger:AddToggle("aimbot_enabled", {
  Visible = true,
  Risky = false,
  Callback = function(Value)
-   settings.holdclick = Value
+   tsettings.holdclick = Value
  end,
 })
 

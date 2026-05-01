@@ -453,7 +453,6 @@ local function Shoot(target)
     createSound()
     createTracer(originPos, chosenPoint)
     SendHitLog(target.Name, head.Name, distToPlayer)
-    ShowHit(chosenPoint, 25)
 
     events.GNX_S:FireServer(tick(), randomKey, tool, "FDS9I83", originPos, {hitDirection}, false)
 
@@ -465,6 +464,9 @@ local function Shoot(target)
         events.GNX_R:FireServer(tick(), "KLWE89U0", tool)
     end)
 end
+
+local soundList = {}
+for name, _ in pairs(sounds) do table.insert(soundList, name) end
 
 run.Heartbeat:Connect(function()
     if not settings.ragebot then return end

@@ -85,6 +85,8 @@ local cockie = {
     SilentAimCircle = nil
 }
 
+local ZFKLF__H = ReplicatedStorage:WaitForChild("Events"):WaitForChild("ZFKLF__H")
+
 local vis = tabs.visuals:AddLeftGroupbox("Player Visuals")
 local silent = tabs.main:AddLeftGroupbox("Silent Aim")
 local aimbot = tabs.main:AddRightGroupbox("Aimbot")

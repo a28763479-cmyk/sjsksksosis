@@ -146,7 +146,7 @@ end)
 local function aimbotfunc()
   while true do
     if aimbots.enabled then
-	  local hitbox = aimbots.hitbox or "Head"
+	  local hitboxpart = aimbots.hitbox or "Head"
       local character = lp.Character
       if character and character:FindFirstChild("Head") then
         local targetpart = nil
@@ -155,8 +155,8 @@ local function aimbotfunc()
         for _, p in pairs(plrs:GetPlayers()) do
           if aimbots.teamcheck and p.Team == lp.Team then continue end
           if aimbots.downedcheck and downedcheck(p) then continue end
-          if p ~= lp and p.Character and p.Character:FindFirstChild(hitbox) then
-			local hitboxtoaim = p.Character[hitbox]
+          if p ~= lp and p.Character and p.Character:FindFirstChild(hitboxpart) then
+			local hitboxtoaim = p.Character[hitboxpart]
             local pos, onscreen = camera:WorldToViewportPoint(hitboxtoaim.Position)
             if onscreen then
               local mousedistance = (Vector2.new(pos.X, pos.Y) - center).Magnitude

@@ -275,6 +275,7 @@ local WallbangSamples = 180
 local WallbangRadius = 25
 local WallbangHeight = 15
 local me = plrs.LocalPlayer
+local mouse = localplayer:GetMouse()
 
 local function RandomString(length)
     local res = ""

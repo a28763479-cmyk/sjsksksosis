@@ -76,18 +76,6 @@ local settings = {
   hitbox = {"Head"}
 }
 
-local rcs = {
-  recoilc = false,
-  cre = false,
-  recoil = 0,
-  recoilxmin = 0,
-  recoilxmax = 0,
-  recoilymin = 0,
-  recoilymax = 0,
-  recoilzmin = 0,
-  recoilzmax = 0
-}
-
 local function downedcheck(p)
   if not p or not p.Character then return false end
   local hum = p.Character:FindFirstChild("Humanoid")
@@ -158,6 +146,7 @@ end)
 local function aimbotfunc()
   while true do
     if aimbots.enabled then
+	  local hitbox = aimbots.hitbox or "Head"
       local character = lp.Character
       if character and character:FindFirstChild("Head") then
         local targetpart = nil
@@ -166,8 +155,9 @@ local function aimbotfunc()
         for _, p in pairs(plrs:GetPlayers()) do
           if aimbots.teamcheck and p.Team == lp.Team then continue end
           if aimbots.downedcheck and downedcheck(p) then continue end
-          if p ~= lp and p.Character and p.Character:FindFirstChild("Head") then
-            local pos, onscreen = camera:WorldToViewportPoint(p.Character.Head.Position)
+          if p ~= lp and p.Character and p.Character:FindFirstChild(hitbox) then
+			local hitboxtoaim = p.Character[hitbox]
+            local pos, onscreen = camera:WorldToViewportPoint(hitboxtoaim.Position)
             if onscreen then
               local mousedistance = (Vector2.new(pos.X, pos.Y) - center).Magnitude
               if mousedistance <= aimbots.fovsize then
@@ -176,12 +166,12 @@ local function aimbotfunc()
                   local rayParams = RaycastParams.new()
                   rayParams.FilterDescendantsInstances = {character, camera}
                   rayParams.FilterType = Enum.RaycastFilterType.Exclude
-                  local rayResult = workspace:Raycast(camera.CFrame.Position, (p.Character.Head.Position - camera.CFrame.Position), rayParams)
+                  local rayResult = workspace:Raycast(camera.CFrame.Position, (hitboxtoaim.Position - camera.CFrame.Position), rayParams)
                   if rayResult and not rayResult.Instance:IsDescendantOf(p.Character) then cansee = false end
                 end
                 if cansee and mousedistance < shortest then
                   shortest = mousedistance
-                  targetpart = p.Character.Head
+                  targetpart = hitboxtoaim
                 end
               end
             end
@@ -786,7 +776,7 @@ worlds:AddToggle("atmosphere_color", {
 
 enemys:AddSlider("aimbot_fovsize", {
  Text = "Max Distance",
- Default = 100,
+ Default = 1000,
  Min = 0,
  Max = 1000,
  Rounding = 1,

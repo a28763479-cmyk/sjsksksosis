@@ -366,6 +366,164 @@ runservice.RenderStepped:Connect(function()
  end
 end)
 
+silent:AddToggle("aimbot_enabled", {
+ Text = "Enabled",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+   silents.enabled = Value
+ end,
+}):AddKeyPicker("silentkey", {
+    Default = "None",
+    SyncToggleState = true,
+    Mode = "Toggle",
+    Text = "Silent aim",
+    NoUI = false,
+})
+
+silent:AddSlider("aimbot_smoothamount", {
+ Text = "Hit chance",
+ Default = 100,
+ Min = 0,
+ Max = 100,
+ Rounding = 1,
+ Compact = false,
+ Callback = function(Value)
+  silents.hitchance = Value
+ end,
+ Disabled = false,
+ Visible = true,
+})
+
+silent:AddDropdown("aimbot_hitbox", {
+ Values = { "Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg" },
+ Default = nil,
+ Multi = false,
+ Text = "Hitbox",
+ Searchable = false,
+ Callback = function(Value)
+  silents.hitbox = { Value }
+ end,
+ Disabled = false,
+ Visible = true,
+})
+
+silent:AddToggle("aimbot_jjj", {
+ Text = "Wall check",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  silents.wallcheck = Value
+ end,
+})
+
+silent:AddToggle("aimbot_jjj", {
+ Text = "Team check",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  silents.teamcheck = Value
+ end,
+})
+
+silent:AddToggle("aimbot_jjj", {
+ Text = "Downed check",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  silents.downedcheck = Value
+ end,
+})
+
+silent:AddToggle("aimbot_fovcircle", {
+ Text = "Fov circle",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  silents.fovcircle = Value
+ end,
+}):AddColorPicker("ColorPicker1", {
+  Default = Color3.new(1, 1, 1),
+  Title = "Fov circle color",
+  Transparency = 0,
+  Callback = function(Value)
+    silents.fovcolor = Value
+  end,
+})
+
+silent:AddSlider("aimbot_fovsize", {
+ Text = "Fov circle size",
+ Default = 300,
+ Min = 1,
+ Max = 500,
+ Rounding = 1,
+ Compact = false,
+ Callback = function(Value)
+  silents.fovsize = Value
+ end,
+ Disabled = false,
+ Visible = true,
+})
+
+silent:AddToggle("aimbot_fovoutline", {
+ Text = "Fov circle outline",
+ Default = true,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  silents.fovoutline = Value
+ end,
+})
+
+silent:AddDropdown("aimbot_fovoutlinetype", {
+ Values = { "Outline", "Inline", "Outline and inline" },
+ Default = 1,
+ Multi = false,
+ Text = "Fov circle outline type",
+ Searchable = false,
+ Callback = function(Value)
+  silents.fovoutlinetype = { Value }
+ end,
+ Disabled = false,
+ Visible = true,
+})
+
+silent:AddToggle("aimbot_fovfill", {
+ Text = "Fov circle fill",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  silents.fovfill = Value
+ end,
+})
+
+silent:AddSlider("aimbot_fovsize", {
+ Text = "Fov fill transparency",
+ Default = 0.8,
+ Min = 0,
+ Max = 1,
+ Rounding = 2,
+ Compact = false,
+ Callback = function(Value)
+  silents.fovfilltrans = Value
+ end,
+ Disabled = false,
+ Visible = true,
+})
+
 aimsec:AddToggle("aimbot_enabled", {
  Text = "Enabled",
  Default = false,
@@ -452,6 +610,24 @@ aimsec:AddToggle("aimbot_downedcheck", {
  Callback = function(Value)
   aimbots.downedcheck = Value
  end,
+})
+
+aimsec:AddToggle("aimbot_fovcircle", {
+ Text = "Fov circle",
+ Default = false,
+ Disabled = false,
+ Visible = true,
+ Risky = false,
+ Callback = function(Value)
+  aimbots.fovcircle = Value
+ end,
+}):AddColorPicker("ColorPicker1", {
+  Default = Color3.new(1, 1, 1),
+  Title = "Fov circle color",
+  Transparency = 0,
+  Callback = function(Value)
+    aimbots.fovcolor = Value
+  end,
 })
 
 aimsec:AddToggle("aimbot_fovcircle", {
@@ -907,8 +1083,8 @@ misce:AddToggle("aimbot_fovfill", {
     Default = false,
     Callback = function(Value)
         hitsound = Value
+		local hits = lp.PlayerGui.CoreGUI:WaitForChild("HitmarkerSound")
 		if hitsound then
-			local hits = lp.PlayerGui.CoreGUI:WaitForChild("HitmarkerSound")
 			hits.SoundId = "rbxassetid://6607204501"
 			hits.Volume = 7
 		else

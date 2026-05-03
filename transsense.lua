@@ -47,7 +47,7 @@ local worlds = tab8:AddTab("World")
 local view = tab8:AddTab("View")
 
 local esp = loadstring(game:HttpGet("https://pastebin.com/raw/ZqUaqzgU"))()
-local arrow = loadstring(game:HttpGet("https://pastebin.com/raw/n1Pgmhjn"))()
+local arrow = loadstring(game:HttpGet("https://pastebin.com/raw/irEbEwPc"))()
 local chams = loadstring(game:HttpGet("https://pastebin.com/raw/wzQ5nPM8"))()
 
 local aimbots = {
@@ -729,7 +729,7 @@ enemys:AddSlider("aimbot_fovsize", {
 
 enemys:AddSlider("aimbot_fovsize", {
  Text = "Arrow size",
- Default = 28,
+ Default = 18,
  Min = 1,
  Max = 50,
  Rounding = 2,

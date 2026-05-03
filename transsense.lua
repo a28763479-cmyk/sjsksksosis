@@ -45,7 +45,7 @@ local localplayer = tab7:AddTab("Player")
 local tab8 = tabs.visuals:AddRightTabbox()
 local worlds = tab8:AddTab("World")
 local view = tab8:AddTab("View")
-local tab9 = tabs.visuals:AddLeftTabbox()
+local tab9 = tabs.misc:AddLeftTabbox()
 local misce = tab9:AddTab("Miscenalleous")
 
 local esp = loadstring(game:HttpGet("https://pastebin.com/raw/ZqUaqzgU"))()
@@ -788,7 +788,7 @@ misce:AddToggle("aimbot_fovfill", {
     Callback = function(Value)
         hitsound = Value
 		if hitsound then
-			local hits = me.PlayerGui.CoreGUI:WaitForChild("HitmarkerSound")
+			local hits = lp.PlayerGui.CoreGUI:WaitForChild("HitmarkerSound")
 			hits.SoundId = "rbxassetid://6607204501"
 			hits.Volume = 7
 		else

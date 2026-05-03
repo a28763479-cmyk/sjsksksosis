@@ -696,49 +696,40 @@ enemys:AddSlider("aimbot_fovsize", {
 })
 
 enemys:AddToggle("aimbot_fovfill", {
- Text = "Off-screen arrow",
- Default = false,
- Disabled = false,
- Visible = true,
- Risky = false,
- Callback = function(Value)
-  arrow.Enabled = Value
- end,
+    Text = "Off-screen arrow",
+    Default = false,
+    Callback = function(Value)
+        arrow.SetEnabled(Value)
+    end,
 }):AddColorPicker("colorpicker3", {
-  Default = Color3.fromRGB(255, 255, 255),
-  Title = "Arrow color",
-  Transparency = 0,
-  Callback = function(value)
-    arrow.Color = value
-  end,
+    Default = Color3.fromRGB(255, 255, 255),
+    Title = "Arrow color",
+    Transparency = 0,
+    Callback = function(value)
+        arrow.SetColor(value)
+    end,
 })
 
-enemys:AddSlider("aimbot_fovsize", {
- Text = "Arrow radius",
- Default = 150,
- Min = 1,
- Max = 500,
- Rounding = 1,
- Compact = false,
- Callback = function(Value)
-  arrow.Radius = Value
- end,
- Disabled = false,
- Visible = true,
+enemys:AddSlider("arrow_radius", {
+    Text = "Arrow radius",
+    Default = 150,
+    Min = 1,
+    Max = 500,
+    Rounding = 1,
+    Callback = function(Value)
+        arrow.SetRadius(Value)
+    end,
 })
 
-enemys:AddSlider("aimbot_fovsize", {
- Text = "Arrow size",
- Default = 18,
- Min = 1,
- Max = 50,
- Rounding = 2,
- Compact = false,
- Callback = function(Value)
-  arrow.Size = Value
- end,
- Disabled = false,
- Visible = true,
+enemys:AddSlider("arrow_size", {
+    Text = "Arrow size",
+    Default = 18,
+    Min = 1,
+    Max = 50,
+    Rounding = 2,
+    Callback = function(Value)
+        arrow.SetSize(Value)
+    end,
 })
 
 local atmosc = Color3.fromRGB(255, 255, 255)

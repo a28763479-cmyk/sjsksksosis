@@ -160,28 +160,28 @@ local function silentloop()
 end
 
 local fov1 = Drawing.new("Circle")
-fov.NumSides = 128
-fov.Visible = false
-fov.Filled = false
-fov.Thickness = 2
+fov1.NumSides = 128
+fov1.Visible = false
+fov1.Filled = false
+fov1.Thickness = 2
 
 local fovo2 = Drawing.new("Circle")
-fovo1.NumSides = 128
-fovo1.Visible = false
-fovo1.Filled = false
-fovo1.Thickness = 3
-
-local fovo3 = Drawing.new("Circle")
 fovo2.NumSides = 128
 fovo2.Visible = false
 fovo2.Filled = false
 fovo2.Thickness = 3
 
+local fovo3 = Drawing.new("Circle")
+fovo3.NumSides = 128
+fovo3.Visible = false
+fovo3.Filled = false
+fovo3.Thickness = 3
+
 local fovfill1 = Drawing.new("Circle")
-fovfill.NumSides = 128
-fovfill.Visible = false
-fovfill.Filled = true
-fovfill.Thickness = 2
+fovfill1.NumSides = 128
+fovfill1.Visible = false
+fovfill1.Filled = true
+fovfill1.Thickness = 2
 
 fov1.ZIndex = 3
 fovo2.ZIndex = 2

@@ -45,6 +45,8 @@ local localplayer = tab7:AddTab("Player")
 local tab8 = tabs.visuals:AddRightTabbox()
 local worlds = tab8:AddTab("World")
 local view = tab8:AddTab("View")
+local tab9 = tabs.visuals:AddLeftTabbox()
+local misce = tab9:AddTab("Miscenalleous")
 
 local esp = loadstring(game:HttpGet("https://pastebin.com/raw/ZqUaqzgU"))()
 local arrow = loadstring(game:HttpGet("https://pastebin.com/raw/irEbEwPc"))()
@@ -777,6 +779,23 @@ enemys:AddSlider("aimbot_fovsize", {
  end,
  Disabled = false,
  Visible = true,
+})
+
+local hitsound = false
+misce:AddToggle("aimbot_fovfill", {
+    Text = "Hit sound",
+    Default = false,
+    Callback = function(Value)
+        hitsound = Value
+		if hitsound then
+			local hits = me.PlayerGui.CoreGUI:WaitForChild("HitmarkerSound")
+			hits.SoundId = "rbxassetid://6607204501"
+			hits.Volume = 7
+		else
+			hits.SoundId = "rbxassetid://160432334"
+			hits.Volume = 1
+		end
+    end,
 })
 
 ThemeManager:SetLibrary(Library)

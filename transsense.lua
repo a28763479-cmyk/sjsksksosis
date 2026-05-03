@@ -109,54 +109,54 @@ local function downedcheck(p)
 end
 
 local function silentloop()
-	local target = nil
-	local visualize = rp:WaitForChild("Events2"):WaitForChild("VisualizeEvent")
-	local ZFKLF__H = rp:WaitForChild("Events"):WaitForChild("ZFKLF__H")
-	local function closest()
-		target = nil
-		local shortest = silents.fovcircle and silents.fovsize or math.huge
-		local center = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-		for _, p in pairs(plrs:GetPlayers()) do
-			if p ~= lp and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-				if silents.teamcheck and p.Team == lp.Team then continue end
-				if silents.downedcheck and downedcheck(p) then continue end
-				local hrp = p.Character.HumanoidRootPart
-				local screenpos, onscreen = camera:WorldToViewportPoint(hrp.Position)
-				if onscreen then
-					local dist = (center - Vector2.new(screenpos.X, screenpos.Y)).Magnitude
-					if dist < shortest then
-						shortest = dist
-						target = p
-					end
-				end
-			end
-		end
-	end
-	run.RenderStepped:Connect(function()
-		if silents.enabled then
-			closest()
-		end
-	end)
-	visualize.Event:Connect(function(_, shotcode, _, gun, _, startpos, bulletpershot)
-		if not silents.enabled or not target or not target.Character then return end
-		if not lp.Character or not lp.Character:FindFirstChildOfClass("Tool") then return end
-		if math.random(1, 100) > silents.hitchance then return end
-		local possibleparts = silents.hitbox
-		local partname = possibeparts[1] or "Head"
-		local targetpart = target.Character:FindFirstChild(partname)
-		if targetpart then
-			local partpos = targetpart.Position
-			local bulletcount = type(bulletpershot) == "table" and #bulletpershot or 1
-			task.wait(0.005)
-			for i = 1, math.clamp(bulletcount, 1, 100) do
-				local dir = (partpos - startpos).Unit
-				ZFKLF__H:FireServer("🧈", gun, shotcode, i, targetpart, partpos, dir)
-			end
-			if gun:FindFirstChild("Hitmarker") then
-				gun.Hitmarker:Fire(targetpart)
-			end
-		end
-	end)  
+    local target = nil
+    local visualize = rp:WaitForChild("Events2"):WaitForChild("VisualizeEvent")
+    local ZFKLF__H = rp:WaitForChild("Events"):WaitForChild("ZFKLF__H")
+    local function closest()
+        target = nil
+        local shortest = silents.fovcircle and silents.fovsize or math.huge
+        local center = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+        for _, p in pairs(plrs:GetPlayers()) do
+            if p ~= lp and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                if silents.teamcheck and p.Team == lp.Team then continue end
+                if silents.downedcheck and downedcheck(p) then continue end
+                local hrp = p.Character.HumanoidRootPart
+                local screenpos, onscreen = camera:WorldToViewportPoint(hrp.Position)
+                if onscreen then
+                    local dist = (center - Vector2.new(screenpos.X, screenpos.Y)).Magnitude
+                    if dist < shortest then
+                        shortest = dist
+                        target = p
+                    end
+                end
+            end
+        end
+    end
+    run.RenderStepped:Connect(function()
+        if silents.enabled then
+            closest()
+        end
+    end)
+    visualize.Event:Connect(function(_, shotcode, _, gun, _, startpos, bulletpershot)
+        if not silents.enabled or not target or not target.Character then return end
+        if not lp.Character or not lp.Character:FindFirstChildOfClass("Tool") then return end
+        if math.random(1, 100) > silents.hitchance then return end
+        local possibleparts = silents.hitbox
+        local partname = possibleparts[1] or "Head"
+        local targetpart = target.Character:FindFirstChild(partname)
+        if targetpart then
+            local partpos = targetpart.Position
+            local bulletcount = type(bulletpershot) == "table" and #bulletpershot or 1
+            task.wait(0.005)
+            for i = 1, math.clamp(bulletcount, 1, 100) do
+                local dir = (partpos - startpos).Unit
+                ZFKLF__H:FireServer("🧈", gun, shotcode, i, targetpart, partpos, dir)
+            end
+            if gun:FindFirstChild("Hitmarker") then
+                gun.Hitmarker:Fire(targetpart)
+            end
+        end
+    end)  
 end
 
 local fov1 = Drawing.new("Circle")

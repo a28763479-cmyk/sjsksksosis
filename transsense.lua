@@ -41,7 +41,7 @@ local tab6 = tabs.aimbot:AddRightTabbox()
 local recoil = tab5:AddTab("Other")
 local tab7 = tabs.visuals:AddLeftTabbox()
 local enemys = tab7:AddTab("Enemy")
-local localplayer = tab7:AddTab("Player")
+local playerc = tab7:AddTab("Player")
 local tab8 = tabs.visuals:AddRightTabbox()
 local worlds = tab8:AddTab("World")
 local view = tab8:AddTab("View")
@@ -1030,7 +1030,7 @@ enemys:AddSlider("arrow_size", {
     end,
 })
 
-localplayer:AddToggle("aimbot_fovfill", {
+playerc:AddToggle("aimbot_fovfill", {
     Text = "Gun chams",
     Default = false,
     Callback = function(Value)
@@ -1038,7 +1038,7 @@ localplayer:AddToggle("aimbot_fovfill", {
     end,
 })
 
-localplayer:AddDropdown("aimbot_fovoutlinetype", {
+playerc:AddDropdown("aimbot_fovoutlinetype", {
  Values = { "Force field", "Glow" },
  Default = 1,
  Multi = false,

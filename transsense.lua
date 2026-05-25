@@ -96,13 +96,13 @@ local silents = {
 
 local armchams = {
 	enabled = false,
-	material = {"Force field"},
+	material = "Force field",
 	color = Color3.fromRGB(255, 255, 255)
 }
 
 local gunchams = {
 	enabled = false,
-	material = {"Force field"},
+	material = "Force field",
 	color = Color3.fromRGB(255, 255, 255)
 }
 
@@ -143,7 +143,7 @@ local function applyff(tool)
     	if tool:IsA("Tool") then
         	for _, v in pairs(tool:GetDescendants()) do 
             	if v:IsA("MeshPart") or v:IsA("Part") then
-                	v.Material = currentmaterial[1]
+                	v.Material = currentmaterial2[1]
                 	v.Color = gunchams.color
             	end
         	end

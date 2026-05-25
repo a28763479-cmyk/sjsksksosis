@@ -139,6 +139,7 @@ local function material2()
 end
 
 local function applyff(tool)
+	material2()
 	if gunchams.enabled then
     	if tool:IsA("Tool") then
         	for _, v in pairs(tool:GetDescendants()) do 

@@ -123,18 +123,18 @@ end
 local currentmaterial = {}
 local function material()
 	if armchams.material == "Force field" then
-		currentmaterial[1] = "ForceField"
+		currentmaterial[1] = Enum.Material.ForceField
 	elseif armchams.material == "Glow" then
-		currentmaterial[1] = "Neon"
+		currentmaterial[1] = Enum.Material.Neon
 	end
 end
 
 local currentmaterial2 = {}
 local function material2()
 	if gunchams.material == "Force field" then
-		currentmaterial2[1] = "ForceField"
+		currentmaterial2[1] = Enum.Material.ForceField
 	elseif gunchams.material == "Glow" then
-		currentmaterial2[1] = "Neon"
+		currentmaterial2[1] = Enum.Material.Neon
 	end
 end
 

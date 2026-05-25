@@ -97,7 +97,7 @@ local silents = {
 local armchams = {
 	enabled = false,
 	material = {"Force field"},
-	color = Colro3.fromRGB(255, 255, 255)
+	color = Color3.fromRGB(255, 255, 255)
 }
 
 local gunchams = {

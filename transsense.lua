@@ -94,6 +94,18 @@ local silents = {
 	fovfilltrans = 0.8
 }
 
+local armchams = {
+	enabled = false,
+	material = {"Force field"},
+	color = Colro3.fromRGB(255, 255, 255)
+}
+
+local gunchams = {
+	enabled = false,
+	material = {"Force field"},
+	color = Color3.fromRGB(255, 255, 255)
+}
+
 local function downedcheck(p)
   if not p or not p.Character then return false end
   local hum = p.Character:FindFirstChild("Humanoid")
@@ -108,55 +120,43 @@ local function downedcheck(p)
   return false
 end
 
-local function silentloop()
-    local target = nil
-    local visualize = rp:WaitForChild("Events2"):WaitForChild("VisualizeEvent")
-    local ZFKLF__H = rp:WaitForChild("Events"):WaitForChild("ZFKLF__H")
-    local function closest()
-        target = nil
-        local shortest = silents.fovcircle and silents.fovsize or math.huge
-        local center = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-        for _, p in pairs(plrs:GetPlayers()) do
-            if p ~= lp and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                if silents.teamcheck and p.Team == lp.Team then continue end
-                if silents.downedcheck and downedcheck(p) then continue end
-                local hrp = p.Character.HumanoidRootPart
-                local screenpos, onscreen = camera:WorldToViewportPoint(hrp.Position)
-                if onscreen then
-                    local dist = (center - Vector2.new(screenpos.X, screenpos.Y)).Magnitude
-                    if dist < shortest then
-                        shortest = dist
-                        target = p
-                    end
-                end
-            end
-        end
-    end
-    run.RenderStepped:Connect(function()
-        if silents.enabled then
-            closest()
-        end
-    end)
-    visualize.Event:Connect(function(_, shotcode, _, gun, _, startpos, bulletpershot)
-        if not silents.enabled or not target or not target.Character then return end
-        if not lp.Character or not lp.Character:FindFirstChildOfClass("Tool") then return end
-        if math.random(1, 100) > silents.hitchance then return end
-        local possibleparts = silents.hitbox
-        local partname = possibleparts[1] or "Head"
-        local targetpart = target.Character:FindFirstChild(partname)
-        if targetpart then
-            local partpos = targetpart.Position
-            local bulletcount = type(bulletpershot) == "table" and #bulletpershot or 1
-            task.wait(0.005)
-            for i = 1, math.clamp(bulletcount, 1, 100) do
-                local dir = (partpos - startpos).Unit
-                ZFKLF__H:FireServer("🧈", gun, shotcode, i, targetpart, partpos, dir)
-            end
-            if gun:FindFirstChild("Hitmarker") then
-                gun.Hitmarker:Fire(targetpart)
-            end
-        end
-    end)  
+local currentmaterial = {}
+local function material()
+	if armchams.material == "Force field" then
+		currentmaterial[1] = "ForceField"
+	elseif armchams.material == "Glow" then
+		currentmaterial[1] = "Neon"
+	end
+end
+
+local currentmaterial2 = {}
+local function material2()
+	if gunchams.material == "Force field" then
+		currentmaterial2[1] = "ForceField"
+	elseif gunchams.material == "Glow" then
+		currentmaterial2[1] = "Neon"
+	end
+end
+
+local function applyff(tool)
+	if gunchams.enabled then
+    	if tool:IsA("Tool") then
+        	for _, v in pairs(tool:GetDescendants()) do 
+            	if v:IsA("MeshPart") or v:IsA("Part") then
+                	v.Material = currentmaterial[1]
+                	v.Color = gunchams.color
+            	end
+        	end
+    	end
+	end
+end
+
+lp.CharacterAdded:Connect(function(char)
+    char.ChildAdded:Connect(applyff)
+end)
+
+if lp.Character then
+    lp.Character.ChildAdded:Connect(applyff)
 end
 
 local fov1 = Drawing.new("Circle")
@@ -1028,6 +1028,27 @@ enemys:AddSlider("arrow_size", {
     Callback = function(Value)
         arrow.SetSize(Value)
     end,
+})
+
+localplayer:AddToggle("aimbot_fovfill", {
+    Text = "Gun chams",
+    Default = false,
+    Callback = function(Value)
+        gunchams.enabled = Value
+    end,
+})
+
+localplayer:AddDropdown("aimbot_fovoutlinetype", {
+ Values = { "Force field", "Glow" },
+ Default = 1,
+ Multi = false,
+ Text = "Gun chams material",
+ Searchable = false,
+ Callback = function(Value)
+  gunchams.material = Value
+ end,
+ Disabled = false,
+ Visible = true,
 })
 
 local atmosc = Color3.fromRGB(255, 255, 255)

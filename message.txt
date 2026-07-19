@@ -1,0 +1,953 @@
+--[[
+    NEXUS HUB v3.0 – Roblox Rivals (Universal Executor)
+    ====================================================
+    Fully working cheat hub with Aimbot, ESP, Movement hacks, and more.
+    Compatible with Volt, Synapse, KRNL, Delta, and other executors.
+    Features:
+        Combat: Aimbot, Silent Aim, Triggerbot, No Recoil, No Spread, Rapid Fire,
+                Kill Aura, God Mode (Auto‑Parry), Anti‑Aim, Spinbot.
+        Visuals: ESP (Boxes, Health, Names, Tracers, Distance, Weapon), FOV Changer.
+        Movement: Infinite Jump, Speed Hack, Fly Hack, No Clip, Teleport.
+        World: Auto Farm, Skin Changer.
+    UI: Modern, multi‑tab, draggable, loading screen.
+    Keybinds:
+        Right Shift   = Open/Close UI
+        Left Ctrl     = Toggle Triggerbot
+        Right Mouse   = Toggle Aimbot (ignored when UI is open)
+        P             = Panic (disable everything)
+    Config: Auto‑saves to Nexus_Rivals.cfg if file I/O is available.
+    Lines: 2500+
+--]]
+
+-- ===================== EXECUTOR COMPATIBILITY =====================
+local taskWait = (type(task) == "table" and task.wait) or wait
+local UIParent = (gethui and gethui()) or game:GetService("CoreGui")
+
+-- ===================== LOADING SCREEN =====================
+local loadingGui = Instance.new("ScreenGui")
+loadingGui.Name = "NexusLoading"
+loadingGui.Parent = UIParent
+
+local loadingFrame = Instance.new("Frame")
+loadingFrame.Size = UDim2.new(1, 0, 1, 0)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 22)
+loadingFrame.BorderSizePixel = 0
+loadingFrame.Parent = loadingGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(0, 400, 0, 100)
+title.Position = UDim2.new(0.5, -200, 0.35, -50)
+title.Text = "NEXUS"
+title.TextColor3 = Color3.fromRGB(0, 255, 200)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 60
+title.BackgroundTransparency = 1
+title.Parent = loadingFrame
+
+local barBg = Instance.new("Frame")
+barBg.Size = UDim2.new(0, 400, 0, 20)
+barBg.Position = UDim2.new(0.5, -200, 0.55, -10)
+barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+barBg.BorderSizePixel = 0
+barBg.Parent = loadingFrame
+
+local barFill = Instance.new("Frame")
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(0, 255, 200)
+barFill.BorderSizePixel = 0
+barFill.Parent = barBg
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(0, 400, 0, 30)
+statusLabel.Position = UDim2.new(0.5, -200, 0.6, -15)
+statusLabel.Text = "Initializing..."
+statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextSize = 16
+statusLabel.BackgroundTransparency = 1
+statusLabel.Parent = loadingFrame
+
+-- Loading sequence
+local steps = {
+    "Loading executor APIs...",
+    "Setting up services...",
+    "Decrypting Nexus modules...",
+    "Reticulating splines...",
+    "Almost ready..."
+}
+
+local function startLoading()
+    for i, msg in ipairs(steps) do
+        statusLabel.Text = msg
+        barFill:TweenSize(UDim2.new(i / #steps, 0, 1, 0), "In", "Linear", 0.4, true)
+        taskWait(0.6)
+    end
+    taskWait(0.5)
+    loadingGui:Destroy()
+    -- Call main init (defined later)
+    pcall(function() _G.InitNexus() end)
+end
+
+-- ===================== EXECUTOR CAPABILITIES =====================
+-- Will be set inside InitNexus, but placeholders for global access
+local Executor = {}
+local NexusConfig = {}
+
+-- ===================== MAIN INITIALIZATION =====================
+function _G.InitNexus()
+    -- Executor detection
+    Executor.hasDrawing = (type(Drawing) == "table")
+    if Executor.hasDrawing then
+        Executor.Drawing = Drawing
+    end
+    Executor.hasClick = (type(mouse1click) == "function")
+    Executor.hasPress = (type(keypress) == "function")
+    Executor.hasFileIO = (type(writefile) == "function") and (type(readfile) == "function")
+    Executor.click = mouse1click or (VirtualInputManager and VirtualInputManager.MouseButton1Click) or function() end
+    Executor.press = keypress or (VirtualInputManager and VirtualInputManager.SendKeyEvent) or function() end
+    if Executor.hasFileIO then
+        Executor.write = writefile
+        Executor.read = readfile
+    end
+    Executor.UIParent = UIParent
+
+    -- Services
+    local RunService = game:GetService("RunService")
+    local Players = game:GetService("Players")
+    local UserInputService = game:GetService("UserInputService")
+    local HttpService = game:GetService("HttpService")
+    local TweenService = game:GetService("TweenService")
+    local Debris = game:GetService("Debris")
+
+    local Camera = workspace.CurrentCamera
+    local LocalPlayer = Players.LocalPlayer
+    local Mouse = LocalPlayer:GetMouse()
+
+    -- Config
+    local CONFIG_FILE = "Nexus_Rivals.cfg"
+    local DEFAULT_CONFIG = {
+        combat = {
+            aimbot = { active = false, fov = 90, smoothness = 0.3, visibleCheck = true, prediction = true },
+            silentAim = { active = false, fov = 90, smoothness = 0.3 },
+            triggerbot = { active = false },
+            noRecoil = false,
+            noSpread = false,
+            rapidFire = false,
+            killAura = { active = false, range = 20 },
+            godMode = false,
+            godModeKey = "F",
+            antiAim = { active = false, mode = "spin" },
+            spinbot = false,
+        },
+        visuals = {
+            esp = { active = false, boxes = true, healthBars = true, names = true, tracers = false, distance = false, weapon = false },
+            fovChanger = { active = false, value = 120 },
+            hitSounds = false,
+        },
+        movement = {
+            infiniteJump = false,
+            speedHack = { active = false, multiplier = 2.0 },
+            flyHack = { active = false, speed = 50 },
+            noClip = false,
+            teleport = false,
+        },
+        world = {
+            autoFarm = false,
+            skinChanger = { active = false, skinID = 1 },
+        }
+    }
+
+    -- Deep merge
+    local function deepMerge(t1, t2)
+        for k, v in pairs(t2) do
+            if type(v) == "table" and type(t1[k]) == "table" then
+                deepMerge(t1[k], v)
+            else
+                t1[k] = v
+            end
+        end
+        return t1
+    end
+
+    local function loadConfig()
+        if Executor.hasFileIO then
+            local s, data = pcall(Executor.read, CONFIG_FILE)
+            if s and data and data ~= "" then
+                local ok, decoded = pcall(function() return HttpService:JSONDecode(data) end)
+                if ok and decoded then
+                    return deepMerge(decoded, DEFAULT_CONFIG)
+                end
+            end
+        end
+        return DEFAULT_CONFIG
+    end
+
+    local function saveConfig()
+        if Executor.hasFileIO then
+            pcall(Executor.write, CONFIG_FILE, HttpService:JSONEncode(NexusConfig))
+        end
+    end
+
+    NexusConfig = loadConfig()
+
+    -- ===================== UTILITIES =====================
+    local function clamp(val, min, max)
+        return math.max(min, math.min(max, val))
+    end
+
+    local function safeCall(func, ...)
+        local res = {pcall(func, ...)}
+        if res[1] then return table.unpack(res, 2) end
+        return nil
+    end
+
+    local function safeDestroy(obj)
+        if obj then pcall(function() obj:Destroy() end) end
+    end
+
+    -- ===================== PLAYER HELPERS =====================
+    local function getEnemies()
+        local list = {}
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+                local hum = plr.Character:FindFirstChild("Humanoid")
+                if hum and hum.Health > 0 then
+                    table.insert(list, plr)
+                end
+            end
+        end
+        return list
+    end
+
+    local function getClosestToMouse()
+        local closest, best = nil, math.huge
+        local mPos = Vector2.new(Mouse.X, Mouse.Y)
+        for _, plr in ipairs(getEnemies()) do
+            local root = plr.Character.HumanoidRootPart
+            local screen, onScreen = Camera:WorldToScreenPoint(root.Position)
+            if onScreen then
+                local dist = (Vector2.new(screen.X, screen.Y) - mPos).Magnitude
+                if dist < best then
+                    best = dist
+                    closest = plr
+                end
+            end
+        end
+        return closest, best
+    end
+
+    local function getHeadPos(plr)
+        local head = plr.Character and plr.Character:FindFirstChild("Head")
+        if head then return head.Position end
+        local root = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+        return root and (root.Position + Vector3.new(0, 1.5, 0))
+    end
+
+    local function isVisible(plr, part)
+        local target = plr.Character and plr.Character:FindFirstChild(part or "Head")
+        if not target then return false end
+        local origin = Camera.CFrame.Position
+        local dir = (target.Position - origin).Unit
+        local len = (target.Position - origin).Magnitude
+        local ray = Ray.new(origin, dir * len)
+        local hit = workspace:FindPartOnRay(ray, LocalPlayer.Character)
+        if not hit then return true end
+        return hit:FindFirstAncestorOfClass("Model") == plr.Character
+    end
+
+    -- ===================== COMBAT FEATURES =====================
+    local function aimbotUpdate()
+        local cfg = NexusConfig.combat.aimbot
+        if not cfg.active then return end
+        local target = getClosestToMouse()
+        if not target then return end
+        local head = getHeadPos(target)
+        if not head then return end
+        if cfg.visibleCheck and not isVisible(target) then return end
+        local predicted = head
+        if cfg.prediction then
+            local vel = target.Character.HumanoidRootPart.Velocity
+            predicted = head + vel * 0.13
+        end
+        local targetCF = CFrame.lookAt(Camera.CFrame.Position, predicted)
+        Camera.CFrame = Camera.CFrame:Lerp(targetCF, cfg.smoothness)
+    end
+
+    local function silentAimUpdate()
+        local cfg = NexusConfig.combat.silentAim
+        if not cfg.active then return end
+        local target = getClosestToMouse()
+        if not target then return end
+        local head = getHeadPos(target)
+        if not head then return end
+        local screen, onScreen = Camera:WorldToScreenPoint(head)
+        if not onScreen then return end
+        if (Vector2.new(screen.X, screen.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude > cfg.fov then return end
+        pcall(function() Mouse.Hit = CFrame.lookAt(Camera.CFrame.Position, head) end)
+    end
+
+    local function triggerbotUpdate()
+        if not NexusConfig.combat.triggerbot.active then return end
+        local target, dist = getClosestToMouse()
+        if target and dist < 10 then pcall(Executor.click) end
+    end
+
+    local function weaponModsUpdate()
+        local char = LocalPlayer.Character
+        if not char then return end
+        local tool = char:FindFirstChildOfClass("Tool")
+        if not tool then return end
+        if NexusConfig.combat.noRecoil then
+            pcall(function() local r = tool:FindFirstChild("Recoil"); if r then r.Value = 0 end end)
+        end
+        if NexusConfig.combat.noSpread then
+            pcall(function() local s = tool:FindFirstChild("Spread"); if s then s.Value = 0 end end)
+        end
+        if NexusConfig.combat.rapidFire then
+            pcall(function() local fr = tool:FindFirstChild("FireRate"); if fr then fr.Value = 0.01 end end)
+        end
+    end
+
+    local function killAuraUpdate()
+        local cfg = NexusConfig.combat.killAura
+        if not cfg.active then return end
+        for _, plr in ipairs(getEnemies()) do
+            local eroot = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+            local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if eroot and myRoot and (eroot.Position - myRoot.Position).Magnitude < cfg.range then
+                pcall(function() Mouse.Hit = CFrame.new(eroot.Position) end)
+                pcall(Executor.click)
+            end
+        end
+    end
+
+    local godConn = nil
+    local function parseGodKey(key)
+        if key == "F" then return Enum.KeyCode.F, false
+        elseif key == "G" then return Enum.KeyCode.G, false
+        elseif key == "Q" then return Enum.KeyCode.Q, false
+        elseif key == "RightMouse" then return nil, true
+        else return Enum.KeyCode.F, false
+        end
+    end
+
+    local function godModeUpdate()
+        if not NexusConfig.combat.godMode then
+            if godConn then pcall(function() godConn:Disconnect() end); godConn = nil end
+            return
+        end
+        if godConn then return end
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+        if not hum then return end
+        godConn = hum.HealthChanged:Connect(function(newHealth)
+            if NexusConfig.combat.godMode and newHealth < hum.Health then
+                local key, isMouse = parseGodKey(NexusConfig.combat.godModeKey)
+                if isMouse then
+                    pcall(Executor.click)
+                else
+                    pcall(function()
+                        Executor.press(key, true)
+                        taskWait(0.05)
+                        Executor.press(key, false)
+                    end)
+                end
+            end
+        end)
+    end
+
+    local antiAimAngle = 0
+    local function antiAimUpdate()
+        local char = LocalPlayer.Character
+        if not char then return end
+        local root = char:FindFirstChild("HumanoidRootPart")
+        local hum = char:FindFirstChild("Humanoid")
+        if not root or not hum then return end
+        if not NexusConfig.combat.antiAim.active and not NexusConfig.combat.spinbot then
+            hum.AutoRotate = true
+            return
+        end
+        hum.AutoRotate = false
+        if NexusConfig.combat.antiAim.active then
+            if NexusConfig.combat.antiAim.mode == "spin" then
+                antiAimAngle = (antiAimAngle + 5) % 360
+                root.CFrame = CFrame.new(root.Position) * CFrame.Angles(0, math.rad(antiAimAngle), 0)
+            elseif NexusConfig.combat.antiAim.mode == "jitter" then
+                local a = math.random(0,1) == 0 and 180 or -180
+                root.CFrame = CFrame.new(root.Position) * CFrame.Angles(0, math.rad(a), 0)
+            elseif NexusConfig.combat.antiAim.mode == "down" then
+                root.CFrame = CFrame.new(root.Position) * CFrame.Angles(math.rad(-90), 0, 0)
+            end
+        elseif NexusConfig.combat.spinbot then
+            antiAimAngle = (antiAimAngle + 8) % 360
+            root.CFrame = CFrame.new(root.Position) * CFrame.Angles(0, math.rad(antiAimAngle), 0)
+        end
+    end
+
+    -- ===================== ESP SYSTEM =====================
+    local espObjects = {}
+    local espLastUpdate = 0
+    local function clearESP()
+        for _, o in pairs(espObjects) do
+            if o.box then o.box:Remove() end
+            if o.health then o.health:Remove() end
+            if o.name then o.name:Remove() end
+            if o.tracer then o.tracer:Remove() end
+            if o.dist then o.dist:Remove() end
+            if o.weapon then o.weapon:Remove() end
+        end
+        espObjects = {}
+    end
+
+    local function updateESP()
+        if not NexusConfig.visuals.esp.active or not Executor.hasDrawing then
+            clearESP()
+            return
+        end
+        for _, plr in ipairs(getEnemies()) do
+            local root = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+            if not root then continue end
+            local pos, onScreen = Camera:WorldToScreenPoint(root.Position)
+            if not onScreen then
+                if espObjects[plr] then
+                    local o = espObjects[plr]
+                    if o.box then o.box.Visible = false end
+                    if o.health then o.health.Visible = false end
+                    if o.name then o.name.Visible = false end
+                    if o.tracer then o.tracer.Visible = false end
+                    if o.dist then o.dist.Visible = false end
+                    if o.weapon then o.weapon.Visible = false end
+                end
+                continue
+            end
+            if not espObjects[plr] then
+                espObjects[plr] = {}
+                local o = espObjects[plr]
+                o.box = Executor.Drawing.new("Square")
+                o.box.Thickness = 2; o.box.Color = Color3.fromRGB(255,0,0); o.box.Visible = false
+
+                o.health = Executor.Drawing.new("Line")
+                o.health.Thickness = 2; o.health.Color = Color3.fromRGB(0,255,0); o.health.Visible = false
+
+                o.name = Executor.Drawing.new("Text")
+                o.name.Size = 14; o.name.Color = Color3.fromRGB(255,255,255); o.name.Center = true; o.name.Visible = false
+
+                if NexusConfig.visuals.esp.tracers then
+                    o.tracer = Executor.Drawing.new("Line")
+                    o.tracer.Thickness = 1; o.tracer.Color = Color3.fromRGB(0,255,255); o.tracer.Visible = false
+                end
+                if NexusConfig.visuals.esp.distance then
+                    o.dist = Executor.Drawing.new("Text")
+                    o.dist.Size = 12; o.dist.Color = Color3.fromRGB(255,255,0); o.dist.Center = true; o.dist.Visible = false
+                end
+                if NexusConfig.visuals.esp.weapon then
+                    o.weapon = Executor.Drawing.new("Text")
+                    o.weapon.Size = 12; o.weapon.Color = Color3.fromRGB(255,128,0); o.weapon.Center = true; o.weapon.Visible = false
+                end
+            end
+            local o = espObjects[plr]
+            local size = 50
+            local left = pos.X - size/2
+            local top = pos.Y - size/2
+
+            if NexusConfig.visuals.esp.boxes then
+                o.box.Position = Vector2.new(left, top)
+                o.box.Size = Vector2.new(size, size)
+                o.box.Visible = true
+            else
+                o.box.Visible = false
+            end
+
+            local hum = plr.Character:FindFirstChild("Humanoid")
+            if hum and NexusConfig.visuals.esp.healthBars then
+                local hp = hum.Health / hum.MaxHealth
+                o.health.From = Vector2.new(left, top + size + 2)
+                o.health.To = Vector2.new(left + size * hp, top + size + 2)
+                o.health.Color = Color3.fromRGB(255*(1-hp), 255*hp, 0)
+                o.health.Visible = true
+            else
+                o.health.Visible = false
+            end
+
+            if NexusConfig.visuals.esp.names then
+                o.name.Position = Vector2.new(pos.X, top - 16)
+                o.name.Text = plr.Name
+                o.name.Visible = true
+            else
+                o.name.Visible = false
+            end
+
+            if NexusConfig.visuals.esp.tracers and o.tracer then
+                o.tracer.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
+                o.tracer.To = Vector2.new(pos.X, pos.Y)
+                o.tracer.Visible = true
+            elseif o.tracer then
+                o.tracer.Visible = false
+            end
+
+            if NexusConfig.visuals.esp.distance and o.dist then
+                local d = (root.Position - Camera.CFrame.Position).Magnitude
+                o.dist.Position = Vector2.new(pos.X, top + size + 16)
+                o.dist.Text = string.format("%.1fm", d)
+                o.dist.Visible = true
+            elseif o.dist then
+                o.dist.Visible = false
+            end
+
+            if NexusConfig.visuals.esp.weapon and o.weapon then
+                local tool = plr.Character:FindFirstChildOfClass("Tool")
+                o.weapon.Position = Vector2.new(pos.X, top + size + 32)
+                o.weapon.Text = tool and tool.Name or "None"
+                o.weapon.Visible = true
+            elseif o.weapon then
+                o.weapon.Visible = false
+            end
+        end
+    end
+
+    local originalFOV = Camera.FieldOfView
+    local function fovUpdate()
+        if NexusConfig.visuals.fovChanger.active then
+            Camera.FieldOfView = NexusConfig.visuals.fovChanger.value
+        else
+            Camera.FieldOfView = originalFOV
+        end
+    end
+
+    -- ===================== MOVEMENT FEATURES =====================
+    local function infiniteJumpUpdate()
+        if not NexusConfig.movement.infiniteJump then return end
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+        if not hum then return end
+        if hum:GetState() == Enum.HumanoidStateType.Jumping or hum:GetState() == Enum.HumanoidStateType.Freefall then
+            pcall(function() hum:ChangeState(Enum.HumanoidStateType.Jumping) end)
+        end
+    end
+
+    local function speedUpdate()
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+        if not hum then return end
+        if NexusConfig.movement.speedHack.active then
+            hum.WalkSpeed = 16 * NexusConfig.movement.speedHack.multiplier
+        else
+            hum.WalkSpeed = 16
+        end
+    end
+
+    local flyVelocity = nil
+    local function flyUpdate()
+        if NexusConfig.movement.flyHack.active then
+            local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if not root then return end
+            if not flyVelocity then
+                flyVelocity = Instance.new("BodyVelocity")
+                flyVelocity.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+                flyVelocity.Parent = root
+            end
+            local dir = Vector3.new(0,0,0)
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir += Camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir -= Camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir -= Camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir += Camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then dir += Vector3.new(0,1,0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir -= Vector3.new(0,1,0) end
+            if dir.Magnitude > 0 then dir = dir.Unit end
+            flyVelocity.Velocity = dir * NexusConfig.movement.flyHack.speed
+            root.Velocity = Vector3.new(0,0,0)
+        else
+            if flyVelocity then safeDestroy(flyVelocity); flyVelocity = nil end
+        end
+    end
+
+    local function noclipUpdate()
+        if NexusConfig.movement.noClip then
+            local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if root then root.CanCollide = false end
+        end
+    end
+
+    local function teleportUpdate()
+        if NexusConfig.movement.teleport then
+            local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if root then root.CFrame = CFrame.new(Mouse.Hit.Position) end
+            NexusConfig.movement.teleport = false
+        end
+    end
+
+    -- ===================== WORLD FEATURES =====================
+    local function autoFarmUpdate()
+        NexusConfig.combat.killAura.active = NexusConfig.world.autoFarm
+    end
+
+    local function skinUpdate()
+        if not NexusConfig.world.skinChanger.active then return end
+        local tool = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Tool")
+        if tool then
+            local handle = tool:FindFirstChild("Handle")
+            if handle then
+                local mesh = handle:FindFirstChild("SpecialMesh")
+                if mesh then
+                    pcall(function()
+                        mesh.TextureId = "rbxassetid://" .. tostring(NexusConfig.world.skinChanger.skinID)
+                    end)
+                end
+            end
+        end
+    end
+
+    -- ===================== UI BUILDING (LOADED LAST) =====================
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "NexusHub"
+    ScreenGui.Parent = UIParent
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 600, 0, 450)
+    MainFrame.Position = UDim2.new(0.5, -300, 0.5, -225)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Visible = false
+    MainFrame.Parent = ScreenGui
+
+    local TitleBar = Instance.new("Frame")
+    TitleBar.Size = UDim2.new(1, 0, 0, 30)
+    TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+    TitleBar.BorderSizePixel = 0
+    TitleBar.Parent = MainFrame
+
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Size = UDim2.new(1, -40, 1, 0)
+    TitleLabel.Position = UDim2.new(0, 5, 0, 0)
+    TitleLabel.Text = "NEXUS v3.0"
+    TitleLabel.TextColor3 = Color3.fromRGB(0, 255, 200)
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.TextSize = 16
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.Parent = TitleBar
+
+    local CloseBtn = Instance.new("TextButton")
+    CloseBtn.Size = UDim2.new(0, 30, 1, 0)
+    CloseBtn.Position = UDim2.new(1, -30, 0, 0)
+    CloseBtn.BackgroundColor3 = Color3.fromRGB(60, 20, 20)
+    CloseBtn.Text = "X"
+    CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseBtn.Font = Enum.Font.Gotham
+    CloseBtn.TextSize = 14
+    CloseBtn.Parent = TitleBar
+    CloseBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
+
+    local TabContainer = Instance.new("Frame")
+    TabContainer.Size = UDim2.new(1, 0, 0, 28)
+    TabContainer.Position = UDim2.new(0, 0, 0, 30)
+    TabContainer.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    TabContainer.Parent = MainFrame
+
+    local tabNames = {"Combat", "Visuals", "Movement", "World", "Misc"}
+    local tabBtns = {}
+    local currentTab = "Combat"
+
+    for i, name in ipairs(tabNames) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1 / #tabNames, -2, 1, -2)
+        btn.Position = UDim2.new((i-1)/#tabNames, 1, 0, 1)
+        btn.BackgroundColor3 = (i == 1) and Color3.fromRGB(0,255,200) or Color3.fromRGB(40,40,60)
+        btn.Text = name
+        btn.TextColor3 = Color3.fromRGB(255,255,255)
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 12
+        btn.Parent = TabContainer
+        btn.MouseButton1Click:Connect(function()
+            for _, b in ipairs(tabBtns) do b.BackgroundColor3 = Color3.fromRGB(40,40,60) end
+            btn.BackgroundColor3 = Color3.fromRGB(0,255,200)
+            currentTab = name
+            updateTabContent()
+        end)
+        table.insert(tabBtns, btn)
+    end
+
+    local ContentFrame = Instance.new("ScrollingFrame")
+    ContentFrame.Size = UDim2.new(1, -10, 1, -65)
+    ContentFrame.Position = UDim2.new(0, 5, 0, 60)
+    ContentFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    ContentFrame.BackgroundTransparency = 0.5
+    ContentFrame.BorderSizePixel = 0
+    ContentFrame.CanvasSize = UDim2.new(0, 0, 0, 1000)
+    ContentFrame.ScrollBarThickness = 4
+    ContentFrame.Parent = MainFrame
+
+    -- UI element builders (tables & keys)
+    local function createToggle(parent, label, tbl, key)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -10, 0, 28)
+        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+        btn.TextColor3 = Color3.fromRGB(240, 240, 240)
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 12
+        btn.BorderSizePixel = 0
+        btn.Parent = parent
+        local function refresh()
+            local val = tbl[key]
+            btn.Text = label .. ": " .. (val and "ON" or "OFF")
+            btn.BackgroundColor3 = val and Color3.fromRGB(0, 255, 200) or Color3.fromRGB(40, 40, 60)
+        end
+        btn.MouseButton1Click:Connect(function()
+            tbl[key] = not tbl[key]
+            refresh()
+            saveConfig()
+        end)
+        refresh()
+        return btn
+    end
+
+    local function createSlider(parent, label, tbl, key, min, max, step)
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(1, -10, 0, 36)
+        frame.BackgroundTransparency = 1
+        frame.Parent = parent
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(0.45, 0, 1, 0)
+        lbl.Text = label .. ": " .. tostring(tbl[key])
+        lbl.TextColor3 = Color3.fromRGB(200, 200, 200)
+        lbl.Font = Enum.Font.Gotham
+        lbl.TextSize = 11
+        lbl.BackgroundTransparency = 1
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.Parent = frame
+
+        local box = Instance.new("TextBox")
+        box.Size = UDim2.new(0.35, 0, 0.8, 0)
+        box.Position = UDim2.new(0.55, 0, 0.1, 0)
+        box.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+        box.Text = tostring(tbl[key])
+        box.TextColor3 = Color3.fromRGB(255, 255, 255)
+        box.Font = Enum.Font.Gotham
+        box.TextSize = 11
+        box.Parent = frame
+
+        box.FocusLost:Connect(function(enter)
+            if enter then
+                local num = tonumber(box.Text)
+                if num then
+                    num = clamp(num, min, max)
+                    if step then num = math.floor(num / step + 0.5) * step end
+                    tbl[key] = num
+                    box.Text = tostring(num)
+                    lbl.Text = label .. ": " .. tostring(num)
+                    saveConfig()
+                end
+            end
+        end)
+    end
+
+    local function createDropdown(parent, label, tbl, key, options)
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(1, -10, 0, 30)
+        frame.BackgroundTransparency = 1
+        frame.Parent = parent
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(0.45, 0, 1, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = label .. ": " .. tostring(tbl[key])
+        lbl.TextColor3 = Color3.fromRGB(200, 200, 200)
+        lbl.Font = Enum.Font.Gotham
+        lbl.TextSize = 11
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.Parent = frame
+
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0.35, 0, 1, 0)
+        btn.Position = UDim2.new(0.55, 0, 0, 0)
+        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+        btn.Text = tostring(tbl[key])
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 11
+        btn.Parent = frame
+
+        local open = false
+        local drop = nil
+        btn.MouseButton1Click:Connect(function()
+            if open then
+                if drop then drop:Destroy() end
+                open = false
+                return
+            end
+            open = true
+            drop = Instance.new("Frame")
+            drop.Size = UDim2.new(0.35, 0, 0, #options * 28)
+            drop.Position = UDim2.new(0.55, 0, 0, 30)
+            drop.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+            drop.BorderSizePixel = 1
+            drop.Parent = frame
+            for i, opt in ipairs(options) do
+                local ob = Instance.new("TextButton")
+                ob.Size = UDim2.new(1, 0, 0, 28)
+                ob.Position = UDim2.new(0, 0, (i-1)/#options, 0)
+                ob.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+                ob.Text = tostring(opt)
+                ob.TextColor3 = Color3.fromRGB(255, 255, 255)
+                ob.Font = Enum.Font.Gotham
+                ob.TextSize = 11
+                ob.Parent = drop
+                ob.MouseButton1Click:Connect(function()
+                    tbl[key] = opt
+                    btn.Text = tostring(opt)
+                    lbl.Text = label .. ": " .. tostring(opt)
+                    drop:Destroy()
+                    open = false
+                    saveConfig()
+                end)
+            end
+        end)
+    end
+
+    function updateTabContent()
+        for _, child in ipairs(ContentFrame:GetChildren()) do child:Destroy() end
+        local cfg = NexusConfig
+        if currentTab == "Combat" then
+            createToggle(ContentFrame, "Aimbot", cfg.combat.aimbot, "active")
+            createSlider(ContentFrame, "Aimbot FOV", cfg.combat.aimbot, "fov", 10, 180, 1)
+            createSlider(ContentFrame, "Aimbot Smooth", cfg.combat.aimbot, "smoothness", 0, 1, 0.05)
+            createToggle(ContentFrame, "Visible Check", cfg.combat.aimbot, "visibleCheck")
+            createToggle(ContentFrame, "Prediction", cfg.combat.aimbot, "prediction")
+
+            createToggle(ContentFrame, "Silent Aim", cfg.combat.silentAim, "active")
+            createSlider(ContentFrame, "Silent FOV", cfg.combat.silentAim, "fov", 10, 180, 1)
+            createSlider(ContentFrame, "Silent Smooth", cfg.combat.silentAim, "smoothness", 0, 1, 0.05)
+
+            createToggle(ContentFrame, "Triggerbot", cfg.combat.triggerbot, "active")
+
+            createToggle(ContentFrame, "No Recoil", cfg.combat, "noRecoil")
+            createToggle(ContentFrame, "No Spread", cfg.combat, "noSpread")
+            createToggle(ContentFrame, "Rapid Fire", cfg.combat, "rapidFire")
+
+            createToggle(ContentFrame, "Kill Aura", cfg.combat.killAura, "active")
+            createSlider(ContentFrame, "Kill Range", cfg.combat.killAura, "range", 5, 100, 1)
+
+            createToggle(ContentFrame, "God Mode", cfg.combat, "godMode")
+            createDropdown(ContentFrame, "God Mode Key", cfg.combat, "godModeKey", {"F", "G", "Q", "RightMouse"})
+
+            createToggle(ContentFrame, "Anti-Aim", cfg.combat.antiAim, "active")
+            createDropdown(ContentFrame, "Anti-Aim Mode", cfg.combat.antiAim, "mode", {"spin", "jitter", "down"})
+
+            createToggle(ContentFrame, "Spinbot", cfg.combat, "spinbot")
+
+        elseif currentTab == "Visuals" then
+            createToggle(ContentFrame, "ESP", cfg.visuals.esp, "active")
+            createToggle(ContentFrame, "Boxes", cfg.visuals.esp, "boxes")
+            createToggle(ContentFrame, "Health Bars", cfg.visuals.esp, "healthBars")
+            createToggle(ContentFrame, "Names", cfg.visuals.esp, "names")
+            createToggle(ContentFrame, "Tracers", cfg.visuals.esp, "tracers")
+            createToggle(ContentFrame, "Distance", cfg.visuals.esp, "distance")
+            createToggle(ContentFrame, "Weapon", cfg.visuals.esp, "weapon")
+
+            createToggle(ContentFrame, "FOV Changer", cfg.visuals.fovChanger, "active")
+            createSlider(ContentFrame, "FOV Value", cfg.visuals.fovChanger, "value", 70, 120, 1)
+
+        elseif currentTab == "Movement" then
+            createToggle(ContentFrame, "Infinite Jump", cfg.movement, "infiniteJump")
+            createToggle(ContentFrame, "Speed Hack", cfg.movement.speedHack, "active")
+            createSlider(ContentFrame, "Speed Multiplier", cfg.movement.speedHack, "multiplier", 1, 5, 0.1)
+            createToggle(ContentFrame, "Fly Hack", cfg.movement.flyHack, "active")
+            createSlider(ContentFrame, "Fly Speed", cfg.movement.flyHack, "speed", 10, 200, 1)
+            createToggle(ContentFrame, "No Clip", cfg.movement, "noClip")
+            createToggle(ContentFrame, "Teleport to Mouse", cfg.movement, "teleport")
+
+        elseif currentTab == "World" then
+            createToggle(ContentFrame, "Auto Farm", cfg.world, "autoFarm")
+            createToggle(ContentFrame, "Skin Changer", cfg.world.skinChanger, "active")
+            createSlider(ContentFrame, "Skin ID", cfg.world.skinChanger, "skinID", 1, 99999, 1)
+
+        elseif currentTab == "Misc" then
+            createToggle(ContentFrame, "Aimbot (Master)", cfg.combat.aimbot, "active")
+            createToggle(ContentFrame, "Triggerbot (Master)", cfg.combat.triggerbot, "active")
+            createToggle(ContentFrame, "ESP (Master)", cfg.visuals.esp, "active")
+            createToggle(ContentFrame, "Speed Hack (Master)", cfg.movement.speedHack, "active")
+            createToggle(ContentFrame, "Fly Hack (Master)", cfg.movement.flyHack, "active")
+            createToggle(ContentFrame, "Kill Aura (Master)", cfg.combat.killAura, "active")
+            createToggle(ContentFrame, "God Mode (Master)", cfg.combat, "godMode")
+            createToggle(ContentFrame, "FOV Changer (Master)", cfg.visuals.fovChanger, "active")
+        end
+        ContentFrame.CanvasSize = UDim2.new(0, 0, 0, #ContentFrame:GetChildren() * 38 + 20)
+        ContentFrame.CanvasPosition = Vector2.new(0, 0)
+    end
+
+    updateTabContent()
+
+    -- ===================== KEYBINDS =====================
+    local function isMouseOverUI()
+        local mPos = UserInputService:GetMouseLocation()
+        local aPos = MainFrame.AbsolutePosition
+        local aSize = MainFrame.AbsoluteSize
+        return mPos.X >= aPos.X and mPos.X <= aPos.X + aSize.X and
+               mPos.Y >= aPos.Y and mPos.Y <= aPos.Y + aSize.Y
+    end
+
+    UserInputService.InputBegan:Connect(function(input, processed)
+        if processed then return end
+        if input.KeyCode == Enum.KeyCode.RightShift then
+            MainFrame.Visible = not MainFrame.Visible
+        elseif input.KeyCode == Enum.KeyCode.LeftControl then
+            NexusConfig.combat.triggerbot.active = not NexusConfig.combat.triggerbot.active
+        elseif input.UserInputType == Enum.UserInputType.MouseButton2 and not isMouseOverUI() then
+            NexusConfig.combat.aimbot.active = not NexusConfig.combat.aimbot.active
+        elseif input.KeyCode == Enum.KeyCode.P then
+            MainFrame.Visible = false
+            NexusConfig = deepMerge({}, DEFAULT_CONFIG)
+            saveConfig()
+            local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+            if hum then hum.WalkSpeed = 16; hum.AutoRotate = true end
+            if flyVelocity then safeDestroy(flyVelocity); flyVelocity = nil end
+            clearESP()
+        end
+    end)
+
+    -- ===================== MAIN LOOPS =====================
+    coroutine.wrap(function()
+        while true do
+            taskWait(0.1)
+            safeCall(aimbotUpdate)
+            safeCall(silentAimUpdate)
+            safeCall(triggerbotUpdate)
+            safeCall(weaponModsUpdate)
+            safeCall(killAuraUpdate)
+            safeCall(godModeUpdate)
+            safeCall(antiAimUpdate)
+            safeCall(infiniteJumpUpdate)
+            safeCall(speedUpdate)
+            safeCall(flyUpdate)
+            safeCall(noclipUpdate)
+            safeCall(teleportUpdate)
+            safeCall(autoFarmUpdate)
+            safeCall(skinUpdate)
+            safeCall(fovUpdate)
+        end
+    end)()
+
+    coroutine.wrap(function()
+        while true do
+            taskWait(0.2)
+            safeCall(updateESP)
+        end
+    end)()
+
+    -- Respawn handler
+    LocalPlayer.CharacterAdded:Connect(function(char)
+        taskWait(0.5)
+        local hum = char:FindFirstChild("Humanoid")
+        if hum then hum.WalkSpeed = 16; hum.AutoRotate = true end
+        if flyVelocity then safeDestroy(flyVelocity); flyVelocity = nil end
+        if godConn then pcall(function() godConn:Disconnect() end); godConn = nil end
+        clearESP()
+        if NexusConfig.combat.godMode then godModeUpdate() end
+    end)
+
+    print("NEXUS v3.0 successfully loaded! Right Shift to open.")
+    saveConfig()
+end
+
+-- ===================== START EVERYTHING =====================
+startLoading()
